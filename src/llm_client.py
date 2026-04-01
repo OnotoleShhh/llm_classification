@@ -1,6 +1,9 @@
-from openai import OpenAI
-from system_prompts import CLASSIFIER_SYSTEM
 import os
+import json
+from openai import OpenAI
+
+from src.system_prompts import CLASSIFIER_SYSTEM
+
 
 class LLMClient():
     """
@@ -15,14 +18,17 @@ class LLMClient():
 
         self.model = 'deepseek-chat'
 
-    def chat(self, text, temperature):
-        
+    def chat(self, text: str, temperature: int = 0.3, sys_prompt = CLASSIFIER_SYSTEM):
+        """
+        text: text to classify
+        temperature: how creative a model should be. 0 - precise, 1 - creative
+        """
         response = self.client.chat.completions.create(
             model = self.model,
             messages=[
                 {
                     "role": "system", 
-                    "content": CLASSIFIER_SYSTEM
+                    "content": sys_prompt
                 },
                 {
                     "role": "user", 

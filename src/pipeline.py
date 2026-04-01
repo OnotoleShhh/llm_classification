@@ -1,22 +1,30 @@
-from llm_client import LLMClient
 import pandas as pd
 import os
+import json
 
-class run_pipeline:
-    def __init__(self):
-        pass
+from src.llm_client import LLMClient
 
-FILE_PATH = os.path.abspath(__file__)
-PROJECT_FOLDER = os.path.dirname(FILE_PATH)
-DATA_FOLDER = os.path.join(PROJECT_FOLDER, 'data', 'Social_Media_Sentiment_Analysis_AI_Trends_2026.csv')
+def load_data(file_name = 'Social_Media_Sentiment_Analysis_AI_Trends_2026.csv', usecols=['post_text']) -> pd.DataFrame:
+    FILE_PATH = os.path.abspath(__file__)
+    SRC_FOLDER = os.path.dirname(FILE_PATH)
+    PROJECT_FOLDER = os.path.dirname(SRC_FOLDER)
+    DATA_FOLDER = os.path.join(PROJECT_FOLDER, 'data')
+    data_path = os.path.join(DATA_FOLDER, file_name)
+    data = pd.read_csv(data_path, usecols=usecols)
+    return data
 
-print(DATA_FOLDER)
+def run_pipeline(data: pd.DataFrame): 
+    client = LLMClient()
+    results = []
+    # classify and return data
+    for text in data['post_text']:
+        answ = client.chat(text)
+        answ = json.loads(answ)
+        results.append({
+            "post_text":text,
+            "sentiment":answ['sentiment']
+        })
 
-client = LLMClient()
+    marked_posts = pd.DataFrame(results)
 
-data = pd.read_csv(DATA_FOLDER)
-print(data.head())
-
-## stopped on making pipeline process. 
-# I need to read data and then process it line by line with my LLMClient class.
-# also i need to understand what is better: to process line by one or in batches.
+    return marked_posts

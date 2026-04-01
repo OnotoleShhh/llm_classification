@@ -4,8 +4,8 @@ positive
 negative
 neutral
 
-Return JSON:
+Return only valid JSON with double quotes and no markdown fence:
 {
-    "message":"positive | negative | neutral"
+    "sentiment": "positive" | "negative" | "neutral"
 }
 """
